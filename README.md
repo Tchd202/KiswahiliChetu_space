@@ -1,5 +1,5 @@
 ---
-title: Gradio Chatbot
+title: KiswahiliChetu Space
 emoji: 💬
 colorFrom: yellow
 colorTo: purple
