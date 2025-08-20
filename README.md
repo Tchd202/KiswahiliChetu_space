@@ -1,6 +1,6 @@
 ---
 title: Kiswahili AI Chat
-emoji: "🇹🇿"
+emoji: "🤖"
 colorFrom: blue
 colorTo: green
 sdk: gradio
