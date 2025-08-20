@@ -1,40 +1,36 @@
-# Create a properly formatted README.md
-cat > README.md << 'EOL'
+# Update README.md with BAKITA color scheme
+cat > README.md << 'EOF'
 ---
 title: Kiswahili Chatbot
-emoji: "🤖"
-colorFrom: blue
-colorTo: green
+emoji: "🇹🇿"
+colorFrom: #0066cc
+colorTo: #003366
 sdk: gradio
 sdk_version: "4.0.0"
 app_file: app.py
 pinned: false
 ---
 
-# Kiswahili Chatbot 🤖
+# Kiswahili Chatbot 🇹🇿
 
-Mazungumzo ya AI kwa lugha ya Kiswahili. Wasiliana na msaidizi wako wa AI kwa lugha ya Kiswahili.
+## Karibu kwenye Mazingira ya Mazungumzo ya Kiswahili
 
-## Maelezo
+### Huduma za Mazungumzo
+- **Mazungumzo ya Kiswahili** - Wasiliana na AI kwa lugha ya Kiswahili
+- **Tafsiri** - Pata tafsiri bora kati ya lugha mbalimbali
+- **Msaada wa Lugha** - Pata mwongozo wa sarufi na matumizi ya Kiswahili
 
-Hii ni interface ya mazungumzo inayotumia modeli ya AI kutoka Hugging Face kuzungumza kwa Kiswahili.
+---
 
-## Matumizi
+### Anwani ya Haraka
+- **Anza Mazungumzo** - Wasiliana na msaidizi wetu wa AI
+- **Badilisha Mipangilio** - Rekebisha mazingira ya mazungumzo
+- **Taarifa zaidi** - Pata maelezo kuhusu huduma zetu
 
-1. Andika ujumbe wako kwa Kiswahili katika kisanduku cha maandishi
-2. Bonyeza kitufe cha "Tuma" au ubonyeze Enter
-3. Subiri majibu kutoka kwa AI
+---
 
-## Sifa
+### Lugha Zinazopatikana
+**Kiswahili** | **Kiingereza** | **Kifaransa** | **Kiarabu**
 
-- Inazungumza Kiswahili kikamilifu
-- Interface rahisi na ya kisasa
-- Inaweza kubadilika kwa hiari (temperature)
-- Inatoa majibu ya haraka na ya haraka
-
-## Teknolojia
-
-- Gradio kwa interface
-- Hugging Face Inference API
-- Modeli: HuggingFaceH4/zephyr-7b-beta
-EOL
+*Inatumia teknolojia ya kisasa ya AI kutoka Hugging Face kwa huduma bora za lugha ya Kiswahili*
+EOF
