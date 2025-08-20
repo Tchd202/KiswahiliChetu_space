@@ -1,9 +1,3 @@
-# BUILD_TIMESTAMP: $(date +%Y%m%d%H%M%S)
-gradio==5.43.1
-torch==2.4.1
-transformers==4.45.1
-accelerate==0.32.1
-protobuf==5.28.2
-sentencepiece==0.2.0
-httpx==0.27.0
-# FORCE_CLEAN: true
+gradio>=4.0.0
+torch>=2.0.0
+transformers>=4.30.0
