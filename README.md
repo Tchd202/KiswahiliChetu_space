@@ -1,6 +1,8 @@
+# Create/update README.md with proper YAML format
+cat > README.md << 'EOL'
 ---
 title: Kiswahili Chatbot
-emoji: 🇹🇿
+emoji: ":tanzania:"
 colorFrom: blue
 colorTo: green
 sdk: gradio
@@ -40,3 +42,4 @@ Hii ni interface ya mazungumzo inayotumia modeli ya AI kutoka Hugging Face kuzun
 
 - [Hugging Face Spaces](https://huggingface.co/spaces)
 - [Gradio Documentation](https://www.gradio.app/docs/)
+EOL
