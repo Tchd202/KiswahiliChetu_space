@@ -1,8 +1,7 @@
-# Create a perfectly formatted README.md
+# If emoji is still problematic, remove it completely
 cat > README.md << 'EOF'
 ---
 title: "Kiswahili Chatbot"
-emoji: "🤖"
 colorFrom: "blue"
 colorTo: "green"
 sdk: "gradio"
@@ -11,7 +10,7 @@ app_file: "app.py"
 pinned: false
 ---
 
-# Kiswahili Chatbot 🇹🇿
+# Kiswahili Chatbot
 
 ## Karibu kwenye Mazingira ya Mazungumzo ya Kiswahili
 
@@ -19,16 +18,4 @@ pinned: false
 - **Mazungumzo ya Kiswahili** - Wasiliana na AI kwa lugha ya Kiswahili
 - **Tafsiri** - Pata tafsiri bora kati ya lugha mbalimbali
 - **Msaada wa Lugha** - Pata mwongozo wa sarufi na matumizi ya Kiswahili
-
----
-
-### Anwani ya Haraka
-- **Anza Mazungumzo** - Wasiliana na msaidizi wetu wa AI
-- **Badilisha Mipangilio** - Rekebisha mazingira ya mazungumzo
-- **Taarifa zaidi** - Pata maelezo kuhusu huduma zetu
-
----
-
-### Lugha Zinazopatikana
-**Kiswahili** | **Kiingereza** | **Kifaransa** | **Kiarabu**
 EOF
