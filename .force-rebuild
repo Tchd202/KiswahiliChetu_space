@@ -1,0 +1,4 @@
+# This file forces Hugging Face to rebuild completely
+BUILD_TIMESTAMP=$(date +%s)
+GRADIO_VERSION=5.43.1
+FORCE_CLEAN_INSTALL=true
