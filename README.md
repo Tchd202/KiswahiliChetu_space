@@ -1,13 +1,13 @@
-# Update README.md with BAKITA color scheme
+# Create a perfectly formatted README.md
 cat > README.md << 'EOF'
 ---
-title: Kiswahili Chatbot
-emoji: "🇹🇿"
-colorFrom: #0066cc
-colorTo: #003366
-sdk: gradio
+title: "Kiswahili Chatbot"
+emoji: "🤖"
+colorFrom: "blue"
+colorTo: "green"
+sdk: "gradio"
 sdk_version: "4.0.0"
-app_file: app.py
+app_file: "app.py"
 pinned: false
 ---
 
@@ -31,6 +31,4 @@ pinned: false
 
 ### Lugha Zinazopatikana
 **Kiswahili** | **Kiingereza** | **Kifaransa** | **Kiarabu**
-
-*Inatumia teknolojia ya kisasa ya AI kutoka Hugging Face kwa huduma bora za lugha ya Kiswahili*
 EOF
