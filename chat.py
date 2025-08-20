@@ -1,46 +1,34 @@
-# chat.py
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from typing import List, Tuple
 
 class KiswahiliChatbot:
-    def __init__(self, model_name: str = "gpt2", device: str = None):
+    def __init__(self, model_name: str = "microsoft/DialoGPT-tiny", device: str = None):
         """
-        Anzisha chatbot ya Kiswahili.
-        :param model_name: Jina la modeli ya Hugging Face au path
-        :param device: "cuda" au "cpu"; inagundua kiotomatiki ikiwa ni None
+        Ultra-fast chatbot with tiny model (only 82MB).
         """
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         print(f"Inatumia kifaa: {self.device}")
 
-        print(f"Inapakia modeli '{model_name}'...")
+        print(f"Inapakia modeli '{model_name}'... (82MB only!)")
+        
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.tokenizer.pad_token = self.tokenizer.eos_token
         self.model = AutoModelForCausalLM.from_pretrained(model_name)
         self.model.to(self.device)
         self.model.eval()
+        print("Modeli imepakika haraka!")
 
     def chat(self, message: str, history: List[Tuple[str, str]] = None, 
-             max_new_tokens: int = 200, temperature: float = 0.7, 
-             top_p: float = 0.95) -> str:
+             max_new_tokens: int = 100, temperature: float = 0.7, 
+             top_p: float = 0.9) -> str:
         """
-        Tengeneza jibu kutoka kwa chatbot.
-        :param message: Maandishi ya mtumiaji
-        :param history: Historia ya mazungumzo
-        :param max_new_tokens: Idadi ya tokeni mpya za kuzalisha
-        :param temperature: Kiwango cha ubunifu
-        :param top_p: Top-p sampling
-        :return: Jibu la chatbot kama string
+        Faster chat method with optimizations.
         """
-        # Tengeneza prompt kutoka kwa historia
-        prompt = ""
-        if history:
-            for user_msg, bot_msg in history:
-                prompt += f"Mtumiaji: {user_msg}\nBot: {bot_msg}\n"
-        prompt += f"Mtumiaji: {message}\nBot:"
+        # Simple prompt - faster processing
+        prompt = f"User: {message}\nAssistant:"
         
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512).to(self.device)
         
         with torch.no_grad():
             output = self.model.generate(
@@ -48,20 +36,16 @@ class KiswahiliChatbot:
                 max_new_tokens=max_new_tokens,
                 pad_token_id=self.tokenizer.eos_token_id,
                 do_sample=True,
-                top_k=50,
-                top_p=top_p,
                 temperature=temperature,
-                repetition_penalty=1.1
+                top_p=top_p,
+                repetition_penalty=1.1,
+                num_return_sequences=1
             )
 
         response = self.tokenizer.decode(output[0], skip_special_tokens=True)
-        response = response.split("Bot:")[-1].strip()
-        
-        # Toa response clean (ondoa prompt ya awali)
-        if prompt in response:
-            response = response.replace(prompt, "").strip()
+        response = response.split("Assistant:")[-1].strip()
         
         return response
 
 # Create global instance for easy access
-bot_instance = KiswahiliChatbot(model_name="gpt2")
+bot_instance = KiswahiliChatbot(model_name="microsoft/DialoGPT-tiny")
