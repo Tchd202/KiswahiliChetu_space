@@ -17,7 +17,11 @@ LANGUAGE_TEXTS = {
         "submit": "Send",
         "error": "An error occurred",
         "thinking": "Thinking...",
-        "examples": "Example Questions"
+        "examples": "Example Questions",
+        "settings": "Settings",
+        "response_length": "Response Length",
+        "creativity": "Creativity Level",
+        "word_selection": "Word Selection"
     },
     "Kiswahili": {
         "title": "Mazungumzo ya AI ya Kiswahili",
@@ -27,7 +31,11 @@ LANGUAGE_TEXTS = {
         "submit": "Tuma",
         "error": "Hitilafu imetokea",
         "thinking": "Inakokotoa...",
-        "examples": "Mifano ya Maswali"
+        "examples": "Mifano ya Maswali",
+        "settings": "Mipangilio",
+        "response_length": "Urefu wa Majibu",
+        "creativity": "Kiashiria cha Ubunifu",
+        "word_selection": "Uchaguzi wa Maneno"
     }
 }
 
@@ -47,7 +55,7 @@ def process_message(message, chat_history, max_tokens, temperature, top_p, langu
         # Add thinking message
         thinking_msg = get_localized_text(language, "thinking")
         yield chat_history + [(message, None)], ""
-        time.sleep(0.1)  # Small delay for UX
+        time.sleep(0.1)
         
         # Get response from chatbot
         response = bot_instance.chat(
@@ -76,16 +84,24 @@ with gr.Blocks(
     theme=gr.themes.Soft(primary_hue="blue", secondary_hue="green"),
     css="""
     .gradio-container { 
-        max-width: 1000px !important; 
+        max-width: 800px !important; 
         margin: auto !important; 
     }
     .chatbot { 
-        min-height: 500px; 
+        min-height: 400px; 
         border-radius: 12px; 
         border: 1px solid #e0e0e0;
+        margin-bottom: 20px;
     }
     .gradio-button {
         border-radius: 8px;
+    }
+    .settings-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        margin-top: 20px;
     }
     """
 ) as demo:
@@ -95,66 +111,62 @@ with gr.Blocks(
     ### Wasiliana na msaidizi wa AI kwa Kiswahili na Kiingereza
     """)
     
-    # Chat interface
-    with gr.Row(equal_height=False):
-        with gr.Column(scale=3):
-            chatbot = gr.Chatbot(
-                label="Mazungumzo",
-                show_copy_button=True,
-                height=550,
-                show_label=False,
-                avatar_images=(None, "https://api.dicebear.com/7.x/bottts/svg?seed=swahili"))
-            
-            with gr.Row():
-                msg = gr.Textbox(
-                    placeholder="Andika ujumbe wako hapa...",
-                    show_label=False,
-                    lines=2,
-                    max_lines=5,
-                    container=False,
-                    scale=8
-                )
-                
-                with gr.Column(scale=2):
-                    submit_btn = gr.Button("📤 Tuma", variant="primary", size="lg")
-                    clear_btn = gr.Button("🗑️ Futa", variant="secondary")
+    # Chat interface - FULL WIDTH
+    chatbot = gr.Chatbot(
+        label="Mazungumzo",
+        show_copy_button=True,
+        height=400,
+        show_label=False,
+        avatar_images=(None, "https://api.dicebear.com/7.x/bottts/svg?seed=swahili")
+    )
+    
+    with gr.Row():
+        msg = gr.Textbox(
+            placeholder="Andika ujumbe wako hapa...",
+            show_label=False,
+            lines=2,
+            max_lines=5,
+            container=False,
+            scale=8
+        )
         
-        with gr.Column(scale=1):
-            gr.Markdown("### ⚙️ Mipangilio")
+        with gr.Column(scale=2):
+            submit_btn = gr.Button("📤 Tuma", variant="primary", size="lg")
+            clear_btn = gr.Button("🗑️ Futa", variant="secondary")
+    
+    # Settings section - BELOW the chat (not on the side)
+    with gr.Accordion("⚙️ Mipangilio", open=False):
+        with gr.Row():
+            with gr.Column():
+                max_tokens = gr.Slider(
+                    minimum=50, maximum=300, value=150, step=10,
+                    label="Urefu wa Majibu",
+                    info="Idadi ya herufi za jibu"
+                )
             
-            max_tokens = gr.Slider(
-                minimum=50, maximum=300, value=150, step=10,
-                label="Urefu wa Majibu",
-                info="Idadi ya herufi za jibu"
-            )
+            with gr.Column():
+                temperature = gr.Slider(
+                    minimum=0.1, maximum=1.5, value=0.7, step=0.1,
+                    label="Kiashiria cha Ubunifu",
+                    info="Kiwango cha mabadiliko ya majibu"
+                )
             
-            temperature = gr.Slider(
-                minimum=0.1, maximum=1.5, value=0.7, step=0.1,
-                label="Kiashiria cha Ubunifu",
-                info="Kiwango cha mabadiliko ya majibu"
-            )
-            
-            top_p = gr.Slider(
-                minimum=0.1, maximum=1.0, value=0.9, step=0.05,
-                label="Uchaguzi wa Top-p",
-                info="Kiwango cha uchaguzi wa maneno"
-            )
-            
-            language = gr.Dropdown(
-                choices=["Kiswahili", "English"],
-                value="Kiswahili",
-                label="Lugha ya Interface",
-                info="Badilisha lugha ya kiolesura"
-            )
-            
-            gr.Markdown("---")
-            gr.Markdown("**📊 Taarifa ya Mfumo:**")
-            gr.Markdown(f"**Modeli:** distilgpt2")
-            gr.Markdown(f"**Gradio:** 5.43.1")
-            gr.Markdown(f"**Transformer:** 4.45.1")
+            with gr.Column():
+                top_p = gr.Slider(
+                    minimum=0.1, maximum=1.0, value=0.9, step=0.05,
+                    label="Uchaguzi wa Top-p",
+                    info="Kiwango cha uchaguzi wa maneno"
+                )
+        
+        language = gr.Dropdown(
+            choices=["Kiswahili", "English"],
+            value="Kiswahili",
+            label="Lugha ya Interface",
+            info="Badilisha lugha ya kiolesura"
+        )
     
     # Examples section
-    with gr.Accordion("📚 Mifano ya Maswali", open=True):
+    with gr.Accordion("📚 Mifano ya Maswali", open=False):
         gr.Examples(
             examples=[
                 ["Habari yako? Unaweza kuniambia kuhusu Tanzania?"],
@@ -168,6 +180,16 @@ with gr.Blocks(
             label="Bonyeza mfano wa swali kujaribu:",
             examples_per_page=3
         )
+    
+    # System info
+    with gr.Accordion("📊 Taarifa ya Mfumo", open=False):
+        gr.Markdown("""
+        **Modeli:** distilgpt2  
+        **Gradio:** 5.43.1  
+        **Transformer:** 4.45.1  
+        **PyTorch:** 2.4.1  
+        **Kifaa:** CPU
+        """)
     
     # Event handlers
     msg.submit(
