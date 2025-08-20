@@ -1,16 +1,13 @@
+# app.py
 import gradio as gr
-from huggingface_hub import InferenceClient
-import time
-
-# Initialize Hugging Face Inference Client
-client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
+from chat import bot_instance  # Import the chatbot instance
 
 # Language texts
 LANGUAGE_TEXTS = {
     "English": {
-        "title": "AI Chat - Conversation Service",
-        "description": "Chat with your AI assistant",
-        "system_default": "You are a friendly assistant who speaks both English and Swahili. Respond in the user's preferred language.",
+        "title": "AI Chat - Local Model",
+        "description": "Chat with your local AI assistant",
+        "system_default": "You are a friendly assistant who speaks both English and Swahili.",
         "placeholder": "Type your message here...",
         "thinking": "Thinking...",
         "clear": "Clear Chat",
@@ -24,6 +21,7 @@ LANGUAGE_TEXTS = {
         "language_label": "Conversation Language",
         "loading": "Loading...",
         "error": "An error occurred. Please try again later.",
+        "examples_label": "Example Questions",
         "examples": [
             ["How are you? Can you tell me about Tanzania?"],
             ["Please suggest some good Swahili books"],
@@ -32,14 +30,14 @@ LANGUAGE_TEXTS = {
         ]
     },
     "Kiswahili": {
-        "title": "Mazungumzo ya AI - Huduma ya Mazungumzo",
-        "description": "Wasiliana na msaidizi wako wa AI",
-        "system_default": "Wewe ni msaidizi mwenye urafiki unaozungumza Kiingereza na Kiswahili. Jibu kwa lugha inayopendekezwa na mtumiaji.",
+        "title": "Mazungumzo ya AI - Modeli ya Ndani",
+        "description": "Wasiliana na msaidizi wako wa AI wa ndani",
+        "system_default": "Wewe ni msaidizi mwenye urafiki unaozungumza Kiingereza na Kiswahili.",
         "placeholder": "Andika ujumbe wako hapa...",
         "thinking": "Inakokotoa...",
         "clear": "Futa Mazungumzo",
         "submit": "Tuma",
-        "retry": "Jaribu Tenai",
+        "retry": "Jaribu Tena",
         "undo": "Rudisha",
         "system_label": "Ujumbe wa Mfumo",
         "max_tokens_label": "Upeo wa Vitokezi kwa Majibu",
@@ -48,6 +46,7 @@ LANGUAGE_TEXTS = {
         "language_label": "Lugha ya Mazungumzo",
         "loading": "Inapakia...",
         "error": "Hitilafu imetokea. Tafadhali jaribu tena baadaye.",
+        "examples_label": "Mifano ya Maswali",
         "examples": [
             ["Habari yako? Unaweza kuniambia kuhusu Tanzania?"],
             ["Tafadhali nipe mapendekezo ya vitabu bora vya Kiswahili"],
@@ -64,54 +63,27 @@ def get_localized_text(language, key):
 def respond(
     message: str,
     history: list[tuple[str, str]] = None,
-    system_message: str = "",
-    max_tokens: int = 512,
+    max_tokens: int = 200,
     temperature: float = 0.7,
     top_p: float = 0.95,
     language: str = "English"
 ):
     """
-    Handles streaming responses from Hugging Face API and yields output.
+    Handles responses using the local chatbot model.
     """
-    history = history or []
-    
-    # Use provided system message or default based on language
-    if not system_message:
-        system_message = get_localized_text(language, "system_default")
-    
-    # Add language instruction to system message
-    if language == "Kiswahili":
-        enhanced_system_message = f"{system_message} Jibu kwa Kiswahili kila wakati."
-    else:
-        enhanced_system_message = f"{system_message} Respond in English always."
-    
-    messages = [{"role": "system", "content": enhanced_system_message}]
-
-    for user_msg, assistant_msg in history:
-        if user_msg:
-            messages.append({"role": "user", "content": user_msg})
-        if assistant_msg:
-            messages.append({"role": "assistant", "content": assistant_msg})
-
-    messages.append({"role": "user", "content": message})
-
-    response = ""
     try:
-        for chunk in client.chat_completion(
-            messages,
-            max_tokens=max_tokens,
-            stream=True,
+        # Use the local chatbot instance
+        response = bot_instance.chat(
+            message=message,
+            history=history,
+            max_new_tokens=max_tokens,
             temperature=temperature,
-            top_p=top_p,
-        ):
-            if chunk.choices and chunk.choices[0].delta.content:
-                token = chunk.choices[0].delta.content
-                response += token
-                yield response
-                
+            top_p=top_p
+        )
+        return response
     except Exception as e:
         error_message = get_localized_text(language, "error")
-        yield f"❌ {error_message}\n\nError: {str(e)}"
+        return f"❌ {error_message}\n\nError: {str(e)}"
 
 def update_ui_language(language):
     """Update UI elements based on selected language"""
@@ -119,29 +91,18 @@ def update_ui_language(language):
         gr.Markdown.update(value=f"# {get_localized_text(language, 'title')}"),
         gr.Markdown.update(value=get_localized_text(language, "description")),
         gr.Chatbot.update(label=get_localized_text(language, "title")),
-        gr.Textbox.update(
-            placeholder=get_localized_text(language, "placeholder"),
-            label=get_localized_text(language, "placeholder")
-        ),
+        gr.Textbox.update(placeholder=get_localized_text(language, "placeholder")),
         gr.Button.update(value=get_localized_text(language, "submit")),
         gr.Button.update(value=get_localized_text(language, "clear")),
-        gr.Textbox.update(
-            value=get_localized_text(language, "system_default"),
-            label=get_localized_text(language, "system_label")
-        ),
         gr.Slider.update(label=get_localized_text(language, "max_tokens_label")),
         gr.Slider.update(label=get_localized_text(language, "temperature_label")),
         gr.Slider.update(label=get_localized_text(language, "top_p_label")),
-        gr.Dropdown.update(label=get_localized_text(language, "language_label")),
-        gr.Examples.update(
-            examples=get_localized_text(language, "examples"),
-            label=f"{get_localized_text(language, 'examples')} ({language})"
-        )
+        gr.Dropdown.update(label=get_localized_text(language, "language_label"))
     ]
 
 # Create the Gradio interface
 with gr.Blocks(
-    title="AI Chat - Multilingual",
+    title="Kiswahili Chatbot - Local",
     theme=gr.themes.Soft(),
     css="""
     .gradio-container {max-width: 900px !important; margin: auto;}
@@ -149,7 +110,6 @@ with gr.Blocks(
     """
 ) as demo:
     
-    # Language state
     current_language = gr.State(value="English")
     
     # Header
@@ -160,13 +120,12 @@ with gr.Blocks(
         with gr.Column(scale=3):
             chatbot = gr.Chatbot(
                 label=get_localized_text('English', 'title'),
-                show_copy_button=True,
-                bubble_full_width=False
+                show_copy_button=True
             )
             
             msg = gr.Textbox(
                 placeholder=get_localized_text('English', 'placeholder'),
-                label=get_localized_text('English', 'placeholder'),
+                label="Message",
                 lines=2
             )
             
@@ -175,14 +134,8 @@ with gr.Blocks(
                 clear_btn = gr.Button(get_localized_text('English', 'clear'))
         
         with gr.Column(scale=1):
-            system_msg = gr.Textbox(
-                value=get_localized_text('English', 'system_default'),
-                label=get_localized_text('English', 'system_label'),
-                lines=3
-            )
-            
             max_tokens = gr.Slider(
-                minimum=64, maximum=2048, value=512, step=64,
+                minimum=64, maximum=512, value=200, step=32,
                 label=get_localized_text('English', 'max_tokens_label')
             )
             
@@ -202,27 +155,40 @@ with gr.Blocks(
                 label=get_localized_text('English', 'language_label')
             )
     
-    # Examples section
-    examples = gr.Examples(
-        examples=get_localized_text('English', 'examples'),
-        inputs=msg,
-        label=f"{get_localized_text('English', 'examples')} (English)"
-    )
+    # Examples sections
+    with gr.Row():
+        with gr.Column():
+            gr.Markdown("### Example Questions (English)")
+            gr.Examples(
+                examples=LANGUAGE_TEXTS["English"]["examples"],
+                inputs=msg,
+                label=""
+            )
+        with gr.Column():
+            gr.Markdown("### Mifano ya Maswali (Kiswahili)")
+            gr.Examples(
+                examples=LANGUAGE_TEXTS["Kiswahili"]["examples"],
+                inputs=msg,
+                label=""
+            )
     
     # Event handlers
-    submit_event = msg.submit(
+    def clear_and_reset():
+        return None, ""
+    
+    msg.submit(
         respond,
-        inputs=[msg, chatbot, system_msg, max_tokens, temperature, top_p, current_language],
+        inputs=[msg, chatbot, max_tokens, temperature, top_p, current_language],
         outputs=chatbot
-    ).then(lambda: "", None, msg)
+    ).then(clear_and_reset, outputs=[chatbot, msg])
     
     submit_btn.click(
         respond,
-        inputs=[msg, chatbot, system_msg, max_tokens, temperature, top_p, current_language],
+        inputs=[msg, chatbot, max_tokens, temperature, top_p, current_language],
         outputs=chatbot
-    ).then(lambda: "", None, msg)
+    ).then(clear_and_reset, outputs=[chatbot, msg])
     
-    clear_btn.click(lambda: None, None, chatbot, queue=False)
+    clear_btn.click(lambda: None, None, chatbot)
     
     # Language change handler
     language_dropdown.change(
@@ -230,18 +196,9 @@ with gr.Blocks(
         inputs=language_dropdown,
         outputs=[
             title_md, description_md, chatbot, msg, submit_btn, clear_btn,
-            system_msg, max_tokens, temperature, top_p, language_dropdown, examples
+            max_tokens, temperature, top_p, language_dropdown
         ]
-    ).then(
-        lambda x: x,  # Update the current language state
-        inputs=language_dropdown,
-        outputs=current_language
-    )
+    ).then(lambda x: x, inputs=language_dropdown, outputs=current_language)
 
 if __name__ == "__main__":
-    demo.launch(
-        server_name="0.0.0.0",
-        share=False,
-        favicon_path=None,
-        show_error=True
-    )
+    demo.launch(share=False, server_name="0.0.0.0")

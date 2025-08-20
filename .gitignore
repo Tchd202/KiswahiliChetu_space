@@ -1,33 +1,18 @@
+# Model files and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+
 # Virtual environments
 .venv/
 venv/
 env/
-ENV/
-
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
 
 # IDE files
 .vscode/
@@ -43,26 +28,6 @@ Thumbs.db
 *.log
 logs/
 
-# Environment variables
-.env
-.env.local
-.env.production
-
-# Data files
-*.pkl
-*.pickle
-*.h5
-*.hdf5
-*.pt
-*.bin
-
-# Hugging Face specific
+# Hugging Face cache
+.cache/
 .huggingface/
-
-# Large directories
-data/
-models/
-assets/
-scripts/
-swahili_data/
-utils/
