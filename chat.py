@@ -3,21 +3,21 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from typing import List, Tuple
 
 class KiswahiliChatbot:
-    def __init__(self, model_name: str = "microsoft/DialoGPT-tiny", device: str = None):
+    def __init__(self, model_name: str = "distilgpt2", device: str = None):
         """
-        Ultra-fast chatbot with tiny model (only 82MB).
+        Very fast chatbot with distilgpt2 model.
         """
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         print(f"Inatumia kifaa: {self.device}")
 
-        print(f"Inapakia modeli '{model_name}'... (82MB only!)")
+        print(f"Inapakia modeli '{model_name}'...")
         
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.model = AutoModelForCausalLM.from_pretrained(model_name)
         self.model.to(self.device)
         self.model.eval()
-        print("Modeli imepakika haraka!")
+        print("Modeli imepakika!")
 
     def chat(self, message: str, history: List[Tuple[str, str]] = None, 
              max_new_tokens: int = 100, temperature: float = 0.7, 
@@ -48,4 +48,4 @@ class KiswahiliChatbot:
         return response
 
 # Create global instance for easy access
-bot_instance = KiswahiliChatbot(model_name="microsoft/DialoGPT-tiny")
+bot_instance = KiswahiliChatbot(model_name="distilgpt2")
