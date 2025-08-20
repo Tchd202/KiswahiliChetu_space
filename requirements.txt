@@ -1,6 +1,4 @@
-cat > requirements.txt << 'EOL'
 gradio>=4.44.1
 torch>=2.0.0
 transformers>=4.30.0
 accelerate>=0.20.0
-EOL
